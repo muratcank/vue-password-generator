@@ -1,28 +1,92 @@
-<template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
-</template>
-
 <script>
-import HelloWorld from './components/HelloWorld.vue';
-
 export default {
   name: 'App',
-  components: {
-    HelloWorld,
+
+  components: {},
+
+  data: () => ({
+    password: null,
+    passwordLength: 8,
+  }),
+
+  methods: {
+    getRandomInt(max) {
+      return Math.floor(Math.random() * Math.floor(max));
+    },
+    generatePassword() {
+      const lowerCaseLetters = 'abcdefghijklmnopqrstuvwxyz'.split('');
+      const upperCaseLetters = 'abcdefghijklmnopqrstuvwxyz'.toUpperCase().split('');
+      const numbers = '1234567890'.split('');
+      const specialCharacters = '*/\\(){}[],.!?=\'"'.split('');
+
+      const pool = lowerCaseLetters
+        .concat(upperCaseLetters)
+        .concat(numbers)
+        .concat(specialCharacters);
+
+      const tempPassword = [];
+
+      for (let index = 0; index < this.passwordLength; index += 1) {
+        const randomIndex = this.getRandomInt(pool.length);
+        tempPassword.push(pool[randomIndex]);
+      }
+
+      this.password = tempPassword.join('');
+    },
+    copyPassword() {
+      if (this.password === '') return false;
+
+      return navigator.clipboard.writeText(this.password);
+    },
   },
 };
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+<template>
+  <v-app>
+    <v-app-bar
+      app
+      color="primary"
+      dark
+    >
+      <span>Vue Password Generator</span>
+    </v-app-bar>
+
+    <v-main>
+      <v-container fill-height>
+        <v-row justify="center">
+          <v-col class="text-center">
+            <v-text-field
+              v-model="passwordLength"
+              name="passwordLength"
+              label="Password Length"
+            />
+          </v-col>
+
+          <v-col class="text-center">
+            <v-btn
+              color="success"
+              outlined
+              elevation="0"
+              @click="generatePassword"
+            >
+            Generate Password
+          </v-btn>
+          </v-col>
+
+          <v-col class="text-center">
+            <v-text-field
+              v-model="password"
+              name="password"
+              label="Password"
+            />
+
+            <v-btn color="success" @click="copyPassword" depressed>
+              Copy
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+  </v-app>
+</template>
